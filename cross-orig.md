@@ -351,6 +351,7 @@ curl -X "OPTIONS" -i -H "Origin: http://fakeoffensive-security.com" -k https://c
 Sol:
 
 ```
+curl -X "OPTIONS" -i -H "Origin: https://evil.www.offensive-security.com" -k https://cors-sandbox/exercise2
 
 curl -X "GET" -i -H "Origin: https://evil.www.offensive-security.com" -k https://cors-sandbox/exercise2 --cookie "SessionCookie=1123581321345589144"
 
