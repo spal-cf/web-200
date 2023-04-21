@@ -20,7 +20,7 @@ These instructions begin with an open curly bracket and a percent sign ({%), whi
 
   ###### Template
 
-  ```
+```
   01  Hello {{ name }},
 02
 03  Thank you for your order! Your items will be shipped out shortly:
@@ -53,7 +53,7 @@ Template Engines
 
 Mustache -> Handlebars-> jinja-> Freemaker-> Twig-> Pug
 
-```
+
 ##### Twig
 
 PHP based
