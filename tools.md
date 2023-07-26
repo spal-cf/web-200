@@ -46,6 +46,8 @@ wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-medium-files.txt
 export URL="http://offsecwp:80/FUZZ/"
 wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt --hc 404,403,301 "$URL"
 
+wfuzz -c -z file,/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt --hc 404,403 -f ./ad-wfuzz.txt,csv https://adselfserviceplus.dxc-ap.com/FUZZ
+
 #### Parameter Discovery:
 
 export URL="http://offsecwp:80/index.php?FUZZ=data"
