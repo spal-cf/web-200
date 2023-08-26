@@ -443,6 +443,14 @@ create table tmp(data text);
 copy tmp from '/etc/passwd';
 select * from tmp;
 ```
+
+```
+create table tmp2(data text);
+copy tmp2 from program 'ls -la';
+select * from tmp2;
+```
+
+
 We can delete the table we created with "drop table tmp;".
 
 ```
