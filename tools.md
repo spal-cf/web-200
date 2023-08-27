@@ -16,6 +16,8 @@ ls -sa /usr/bin | sed 's/[0-9]*//g' | sed -r 's/\s+//g' |sort -u > $HOME/binarie
 
 gobuster dir -u $URL -w /usr/share/wordlists/dirb/common.txt -t 5 -b 301
 
+gobuster dir -u $URL -w /usr/share/seclists/Discovery/Web-Content/raft-medium-files.txt -t 5 -b 301
+
 gobuster dns -d megacorpone.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -t 30
 
 gobuster dir -u $URL -w /usr/share/wordlists/dirb/common.txt -x php,html,asp 
